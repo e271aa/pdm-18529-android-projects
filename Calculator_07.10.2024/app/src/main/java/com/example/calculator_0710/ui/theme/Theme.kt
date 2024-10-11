@@ -1,4 +1,4 @@
-package com.example.calculator_07102024.ui.theme
+package com.example.calculator_0710.ui.theme
 
 import android.app.Activity
 import android.os.Build
@@ -34,7 +34,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun Calculator_07102024Theme(
+fun Calculator_0710Theme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
