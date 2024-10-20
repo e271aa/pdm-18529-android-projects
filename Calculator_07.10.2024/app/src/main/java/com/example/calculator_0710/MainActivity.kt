@@ -210,36 +210,31 @@ fun Calculator() {
     // Estados que guardam o primeiro número e a operação selecionada
     var firstNumber = remember { mutableStateOf("") }
     var operation = remember { mutableStateOf<Char?>(null) }
-
+    CalculatorScren()
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
+        Column (
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            // Corrigindo aqui: Pegamos o valor de 'display' com '.value'
-            Text(
-                text = display.value,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp), // Ajusta o padding vertical para aproximar mais dos botões
-                fontSize = 48.sp, // Tamanho grande para o visor
-                textAlign = TextAlign.Right // Alinha o texto à direita
-            )
+            CalculatorRow(listOf("MRC", "M-", "M+", "ON/C")) { label ->
+            onButtonClick(label, display.value, { display.value = it }, { firstNumber.value = it }, { operation.value = it }, firstNumber.value, operation.value)
         }
+            CalculatorRow(listOf("√", "%", "+/-", "CE")) { label ->
+                onButtonClick(label, display.value, { display.value = it }, { firstNumber.value = it }, { operation.value = it }, firstNumber.value, operation.value)
+            } }
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            CalculatorRow(listOf("7", "8", "9", "/")) { label ->
+            CalculatorRow(listOf("7", "8", "9", "÷")) { label ->
                 onButtonClick(label, display.value, { display.value = it }, { firstNumber.value = it }, { operation.value = it }, firstNumber.value, operation.value)
             }
-            CalculatorRow(listOf("4", "5", "6", "*")) { label ->
+            CalculatorRow(listOf("4", "5", "6", "×")) { label ->
                 onButtonClick(label, display.value, { display.value = it }, { firstNumber.value = it }, { operation.value = it }, firstNumber.value, operation.value)
             }
             CalculatorRow(listOf("1", "2", "3", "-")) { label ->
@@ -261,6 +256,28 @@ fun CalculatorButton(text: String, modifier: Modifier = Modifier, onClick: () ->
             .height(80.dp)
     ) {
         Text(text = text, fontSize = 24.sp)
+    }
+}
+
+@Composable
+fun CalculatorScren(){
+    // Estado que guarda o valor mostrado no visor
+    var display = remember { mutableStateOf("0") }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.Bottom  // Alinha o conteúdo no fundo
+    ) {
+        // Corrigindo aqui: Pegamos o valor de 'display' com '.value'
+        Text(
+            text = display.value,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp), // Ajusta o padding vertical para aproximar mais dos botões
+            fontSize = 48.sp, // Tamanho grande para o visor
+            textAlign = TextAlign.Right // Alinha o texto à direita
+        )
     }
 }
 
