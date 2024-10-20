@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.calculatorproject.ui.theme.CalculatorProjectTheme
@@ -77,29 +78,36 @@ fun CalculatorScreen() {
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp)
-    ) {
-        CalculatorDisplay(display)
-        Spacer(modifier = Modifier.height(16.dp))
-        CalculatorKeypad(
-            modifier = Modifier.weight(1f),
-            onDigitClick = ::updateDisplay,
-            onOperationClick = ::setOperation,
-            onEqualsClick = ::calculate,
-            onClearClick = { display = "0" },
-            onMemoryRecall = { display = memory.toString() },
-            onMemoryAdd = { memory += display.toDoubleOrNull() ?: 0.0 },
-            onMemorySubtract = { memory -= display.toDoubleOrNull() ?: 0.0 },
-            onSquareRoot = { display = Math.sqrt(display.toDoubleOrNull() ?: 0.0).toString() },
-            onPercentage = { display = (display.toDoubleOrNull()?.div(100) ?: 0.0).toString() },
-            onSignChange = { display = (-(display.toDoubleOrNull() ?: 0.0)).toString() }
-        )
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        containerColor = Color(0xFFAFAFAF)
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp)
+        ) {
+            CalculatorDisplay(display)
+            Spacer(modifier = Modifier.height(16.dp))
+            CalculatorKeypad(
+                modifier = Modifier.weight(1f),
+                onDigitClick = ::updateDisplay,
+                onOperationClick = ::setOperation,
+                onEqualsClick = ::calculate,
+                onClearClick = { display = "0" },
+                onMemoryRecall = { display = memory.toString() },
+                onMemoryAdd = { memory += display.toDoubleOrNull() ?: 0.0 },
+                onMemorySubtract = { memory -= display.toDoubleOrNull() ?: 0.0 },
+                onSquareRoot = { display = Math.sqrt(display.toDoubleOrNull() ?: 0.0).toString() },
+                onPercentage = { display = (display.toDoubleOrNull()?.div(100) ?: 0.0).toString() },
+                onSignChange = { display = (-(display.toDoubleOrNull() ?: 0.0)).toString() }
+            )
+        }
     }
 }
+
+
 
 @Composable
 fun CalculatorDisplay(display: String) {
@@ -139,40 +147,40 @@ fun CalculatorKeypad(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         CalculatorRow {
-            CalculatorButton("MRC", Modifier.weight(1f), onMemoryRecall)
-            CalculatorButton("M-", Modifier.weight(1f), onMemorySubtract)
-            CalculatorButton("M+", Modifier.weight(1f), onMemoryAdd)
-            CalculatorButton("ON/C", Modifier.weight(1f), onClearClick)
+            CalculatorButton("MRC", Modifier.weight(1f), onClick = onMemoryRecall)
+            CalculatorButton("M-", Modifier.weight(1f), onClick = onMemorySubtract)
+            CalculatorButton("M+", Modifier.weight(1f), onClick = onMemoryAdd)
+            CalculatorButton("ON/C", Modifier.weight(1f), onClick = onClearClick, backgroundColor = Color(0xFFD1546F))
         }
         CalculatorRow {
-            CalculatorButton("√", Modifier.weight(1f), onSquareRoot)
-            CalculatorButton("%", Modifier.weight(1f), onPercentage)
-            CalculatorButton("±", Modifier.weight(1f), onSignChange)
-            CalculatorButton("CE", Modifier.weight(1f), onClearClick)
+            CalculatorButton("√", Modifier.weight(1f), onClick = onSquareRoot)
+            CalculatorButton("%", Modifier.weight(1f), onClick = onPercentage)
+            CalculatorButton("±", Modifier.weight(1f), onClick = onSignChange)
+            CalculatorButton("CE", Modifier.weight(1f), onClick = onClearClick, backgroundColor = Color(0xFFD1546F))
         }
         CalculatorRow {
-            CalculatorButton("7", Modifier.weight(1f)) { onDigitClick("7") }
-            CalculatorButton("8", Modifier.weight(1f)) { onDigitClick("8") }
-            CalculatorButton("9", Modifier.weight(1f)) { onDigitClick("9") }
-            CalculatorButton("÷", Modifier.weight(1f)) { onOperationClick("÷") }
+            CalculatorButton("7", Modifier.weight(1f), onClick = { onDigitClick("7") })
+            CalculatorButton("8", Modifier.weight(1f), onClick = { onDigitClick("8") })
+            CalculatorButton("8", Modifier.weight(1f), onClick = { onDigitClick("9") })
+            CalculatorButton("÷", Modifier.weight(1f), onClick = { onOperationClick("÷") })
         }
         CalculatorRow {
-            CalculatorButton("4", Modifier.weight(1f)) { onDigitClick("4") }
-            CalculatorButton("5", Modifier.weight(1f)) { onDigitClick("5") }
-            CalculatorButton("6", Modifier.weight(1f)) { onDigitClick("6") }
-            CalculatorButton("×", Modifier.weight(1f)) { onOperationClick("×") }
+            CalculatorButton("4", Modifier.weight(1f), onClick = { onDigitClick("4") })
+            CalculatorButton("5", Modifier.weight(1f), onClick = { onDigitClick("5") })
+            CalculatorButton("6", Modifier.weight(1f), onClick = { onDigitClick("6") })
+            CalculatorButton("×", Modifier.weight(1f), onClick = { onOperationClick("×") })
         }
         CalculatorRow {
-            CalculatorButton("1", Modifier.weight(1f)) { onDigitClick("1") }
-            CalculatorButton("2", Modifier.weight(1f)) { onDigitClick("2") }
-            CalculatorButton("3", Modifier.weight(1f)) { onDigitClick("3") }
-            CalculatorButton("-", Modifier.weight(1f)) { onOperationClick("-") }
+            CalculatorButton("1", Modifier.weight(1f), onClick = { onDigitClick("1") })
+            CalculatorButton("2", Modifier.weight(1f), onClick = { onDigitClick("2") })
+            CalculatorButton("3", Modifier.weight(1f), onClick = { onDigitClick("3") })
+            CalculatorButton("-", Modifier.weight(1f), onClick = { onOperationClick("-") })
         }
         CalculatorRow {
-            CalculatorButton("0", Modifier.weight(1f)) { onDigitClick("0") }
-            CalculatorButton(".", Modifier.weight(1f)) { onDigitClick(".") }
-            CalculatorButton("=", Modifier.weight(1f), onEqualsClick)
-            CalculatorButton("+", Modifier.weight(1f)) { onOperationClick("+") }
+            CalculatorButton("0", Modifier.weight(1f), onClick = { onDigitClick("0") })
+            CalculatorButton(".", Modifier.weight(1f), onClick = { onDigitClick(".") })
+            CalculatorButton("3", Modifier.weight(1f), onClick = onEqualsClick)
+            CalculatorButton("+", Modifier.weight(1f), onClick = { onOperationClick("+") })
         }
     }
 }
@@ -190,24 +198,32 @@ fun CalculatorRow(content: @Composable RowScope.() -> Unit) {
 fun CalculatorButton(
     text: String,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    height: Dp = 60.dp,
+    backgroundColor: Color = Color(0xFF787878)
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier.aspectRatio(1f),
+        modifier = modifier.height(height),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Black,
-            //containerColor = MaterialTheme.colorScheme.primary,
+            containerColor = backgroundColor,
             contentColor = Color.White
         ),
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(8.dp),
+        contentPadding = PaddingValues(0.dp)
     ) {
-        Text(
-            text = text,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
-        )
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = text,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+            )
+        }
     }
 }
 
