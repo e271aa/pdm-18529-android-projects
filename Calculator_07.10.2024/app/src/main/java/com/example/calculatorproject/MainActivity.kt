@@ -44,25 +44,41 @@ fun CalculatorScreen() {
     var currentOperation by remember { mutableStateOf<String?>(null) }
     var firstOperand by remember { mutableStateOf<Double?>(null) }
     var memory by remember { mutableStateOf(0.0) }
+    var shouldResetDisplay by remember { mutableStateOf(false) }
 
     fun updateDisplay(digit: String) {
-        display = if (display == "0" && digit != ".") digit else display + digit
+        if (shouldResetDisplay) {
+            display = digit
+            shouldResetDisplay = false
+        } else {
+            display = if (display == "0" && digit != ".") digit else display + digit
+        }
     }
 
     fun resetCalculator() {
         display = "0"
         firstOperand = null
         currentOperation = null
-        memory = 0.0
+        shouldResetDisplay = false
     }
 
     fun resetCalculatorState() {
         firstOperand = null
         currentOperation = null
+        shouldResetDisplay = false
+    }
+
+    fun formatMemoryValue(value: Double): String {
+        return if (value % 1.0 == 0.0) {
+            value.toInt().toString()
+        } else {
+            value.toString()
+        }
     }
 
     fun calculate() {
         val secondOperand = display.toDoubleOrNull()
+
         if (firstOperand != null && secondOperand != null && currentOperation != null) {
             val result = when (currentOperation) {
                 "+" -> firstOperand!! + secondOperand
@@ -72,24 +88,40 @@ fun CalculatorScreen() {
                 else -> secondOperand
             }
             display = formatResult(result)
-            resetCalculatorState()
+            firstOperand = null
+            currentOperation = null
+            shouldResetDisplay = true
         }
-        currentOperation = null
     }
 
     fun setOperation(op: String) {
-        if (firstOperand == null) {
-            firstOperand = display.toDoubleOrNull()
+        val secondOperand = display.toDoubleOrNull()
+
+        if (firstOperand != null && secondOperand != null && currentOperation != null) {
+            val result = when (currentOperation) {
+                "+" -> firstOperand!! + secondOperand
+                "-" -> firstOperand!! - secondOperand
+                "×" -> firstOperand!! * secondOperand
+                "÷" -> if (secondOperand != 0.0) firstOperand!! / secondOperand else Double.NaN
+                else -> secondOperand
+            }
+            display = formatResult(result)
+            firstOperand = result
         } else {
-            calculate()
+            firstOperand = display.toDoubleOrNull()
         }
+
         currentOperation = op
-        display = "0"
+        shouldResetDisplay = true
     }
 
-    fun percentage() {
-        val value = display.toDoubleOrNull() ?: return
-        display = formatResult(value / 100)
+    fun applyPercentage() {
+        if (firstOperand != null && currentOperation != null) {
+            val secondOperand = display.toDoubleOrNull() ?: 0.0
+            val percentageValue = (firstOperand!! * secondOperand) / 100
+            display = formatResult(percentageValue)
+            shouldResetDisplay = true 
+        }
     }
 
     fun changeSign() {
@@ -123,11 +155,11 @@ fun CalculatorScreen() {
                     onEqualsClick = ::calculate,
                     onEraseClick = ::resetCalculator,
                     onClearClick = { display = "0" },
-                    onMemoryRecall = { display = memory.toString() },
+                    onMemoryRecall = { display = formatMemoryValue(memory) },
                     onMemoryAdd = { memory += display.toDoubleOrNull() ?: 0.0 },
                     onMemorySubtract = { memory -= display.toDoubleOrNull() ?: 0.0 },
                     onSquareRoot = { display = formatResult(Math.sqrt(display.toDoubleOrNull() ?: 0.0)) },
-                    onPercentage = ::percentage,
+                    onPercentage = ::applyPercentage,
                     onSignChange = ::changeSign
                 )
             }
