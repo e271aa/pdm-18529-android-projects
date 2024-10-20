@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.calculatorproject.ui.theme.CalculatorProjectTheme
 
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,16 +33,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun CalculatorTheme(content: @Composable () -> Unit) {
-    MaterialTheme(
-        colorScheme = lightColorScheme(
-            primary = Color(0xFF4A4A4A),
-            surface = Color(0xFFD3D3D3),
-            background = Color(0xFFE0E0E0)
-        ),
-        content = content
-    )
+fun formatResult(value: Double): String {
+    val formatted = value.toString().removeSuffix(".0")
+    return if (formatted.length > 9) formatted.take(9) else formatted
 }
 
 @Composable
@@ -57,10 +49,16 @@ fun CalculatorScreen() {
         display = if (display == "0" && digit != ".") digit else display + digit
     }
 
-    fun setOperation(op: String) {
-        firstOperand = display.toDoubleOrNull()
-        currentOperation = op
+    fun resetCalculator() {
         display = "0"
+        firstOperand = null
+        currentOperation = null
+        memory = 0.0
+    }
+
+    fun resetCalculatorState() {
+        firstOperand = null
+        currentOperation = null
     }
 
     fun calculate() {
@@ -70,15 +68,34 @@ fun CalculatorScreen() {
                 "+" -> firstOperand!! + secondOperand
                 "-" -> firstOperand!! - secondOperand
                 "×" -> firstOperand!! * secondOperand
-                "÷" -> firstOperand!! / secondOperand
+                "÷" -> if (secondOperand != 0.0) firstOperand!! / secondOperand else Double.NaN
                 else -> secondOperand
             }
-            display = result.toString().take(10)
-            firstOperand = null
-            currentOperation = null
+            display = formatResult(result)
+            resetCalculatorState()
         }
+        currentOperation = null
     }
 
+    fun setOperation(op: String) {
+        if (firstOperand == null) {
+            firstOperand = display.toDoubleOrNull()
+        } else {
+            calculate()
+        }
+        currentOperation = op
+        display = "0"
+    }
+
+    fun percentage() {
+        val value = display.toDoubleOrNull() ?: return
+        display = formatResult(value / 100)
+    }
+
+    fun changeSign() {
+        val value = display.toDoubleOrNull() ?: return
+        display = formatResult(-value)
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -104,13 +121,14 @@ fun CalculatorScreen() {
                     onDigitClick = ::updateDisplay,
                     onOperationClick = ::setOperation,
                     onEqualsClick = ::calculate,
+                    onEraseClick = ::resetCalculator,
                     onClearClick = { display = "0" },
                     onMemoryRecall = { display = memory.toString() },
                     onMemoryAdd = { memory += display.toDoubleOrNull() ?: 0.0 },
                     onMemorySubtract = { memory -= display.toDoubleOrNull() ?: 0.0 },
-                    onSquareRoot = { display = Math.sqrt(display.toDoubleOrNull() ?: 0.0).toString() },
-                    onPercentage = { display = (display.toDoubleOrNull()?.div(100) ?: 0.0).toString() },
-                    onSignChange = { display = (-(display.toDoubleOrNull() ?: 0.0)).toString() }
+                    onSquareRoot = { display = formatResult(Math.sqrt(display.toDoubleOrNull() ?: 0.0)) },
+                    onPercentage = ::percentage,
+                    onSignChange = ::changeSign
                 )
             }
         }
@@ -146,6 +164,7 @@ fun CalculatorKeypad(
     onOperationClick: (String) -> Unit,
     onEqualsClick: () -> Unit,
     onClearClick: () -> Unit,
+    onEraseClick: () -> Unit,
     onMemoryRecall: () -> Unit,
     onMemoryAdd: () -> Unit,
     onMemorySubtract: () -> Unit,
@@ -161,7 +180,7 @@ fun CalculatorKeypad(
             CalculatorButton("MRC", Modifier.weight(1f), onClick = onMemoryRecall, backgroundColor = Color.Black)
             CalculatorButton("M-", Modifier.weight(1f), onClick = onMemorySubtract, backgroundColor = Color.Black)
             CalculatorButton("M+", Modifier.weight(1f), onClick = onMemoryAdd, backgroundColor = Color.Black)
-            CalculatorButton("ON/C", Modifier.weight(1f), onClick = onClearClick, backgroundColor = Color(0xFFD1546F))
+            CalculatorButton("ON/C", Modifier.weight(1f), onClick = onEraseClick, backgroundColor = Color(0xFFD1546F))
         }
         CalculatorRow {
             CalculatorButton("√", Modifier.weight(1f), onClick = onSquareRoot, backgroundColor = Color.Black)
@@ -173,7 +192,7 @@ fun CalculatorKeypad(
             CalculatorButton("7", Modifier.weight(1f), onClick = { onDigitClick("7") })
             CalculatorButton("8", Modifier.weight(1f), onClick = { onDigitClick("8") })
             CalculatorButton("9", Modifier.weight(1f), onClick = { onDigitClick("9") })
-            CalculatorButton("÷", Modifier.weight(1f), onClick = { onOperationClick("÷")}, backgroundColor = Color.Black)
+            CalculatorButton("÷", Modifier.weight(1f), onClick = { onOperationClick("÷") }, backgroundColor = Color.Black)
         }
         CalculatorRow {
             CalculatorButton("4", Modifier.weight(1f), onClick = { onDigitClick("4") })
@@ -232,7 +251,7 @@ fun CalculatorButton(
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                maxLines = 1,
+                maxLines = 1
             )
         }
     }
@@ -240,9 +259,8 @@ fun CalculatorButton(
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun DefaultPreview() {
     CalculatorProjectTheme {
         CalculatorScreen()
     }
 }
-
