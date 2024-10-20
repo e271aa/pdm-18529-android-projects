@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -78,36 +79,43 @@ fun CalculatorScreen() {
         }
     }
 
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = Color(0xFFAFAFAF)
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center
         ) {
-            CalculatorDisplay(display)
-            Spacer(modifier = Modifier.height(16.dp))
-            CalculatorKeypad(
-                modifier = Modifier.weight(1f),
-                onDigitClick = ::updateDisplay,
-                onOperationClick = ::setOperation,
-                onEqualsClick = ::calculate,
-                onClearClick = { display = "0" },
-                onMemoryRecall = { display = memory.toString() },
-                onMemoryAdd = { memory += display.toDoubleOrNull() ?: 0.0 },
-                onMemorySubtract = { memory -= display.toDoubleOrNull() ?: 0.0 },
-                onSquareRoot = { display = Math.sqrt(display.toDoubleOrNull() ?: 0.0).toString() },
-                onPercentage = { display = (display.toDoubleOrNull()?.div(100) ?: 0.0).toString() },
-                onSignChange = { display = (-(display.toDoubleOrNull() ?: 0.0)).toString() }
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                CalculatorDisplay(display)
+                Spacer(modifier = Modifier.height(16.dp))
+                CalculatorKeypad(
+                    modifier = Modifier.fillMaxWidth(),
+                    onDigitClick = ::updateDisplay,
+                    onOperationClick = ::setOperation,
+                    onEqualsClick = ::calculate,
+                    onClearClick = { display = "0" },
+                    onMemoryRecall = { display = memory.toString() },
+                    onMemoryAdd = { memory += display.toDoubleOrNull() ?: 0.0 },
+                    onMemorySubtract = { memory -= display.toDoubleOrNull() ?: 0.0 },
+                    onSquareRoot = { display = Math.sqrt(display.toDoubleOrNull() ?: 0.0).toString() },
+                    onPercentage = { display = (display.toDoubleOrNull()?.div(100) ?: 0.0).toString() },
+                    onSignChange = { display = (-(display.toDoubleOrNull() ?: 0.0)).toString() }
+                )
+            }
         }
     }
 }
-
-
 
 @Composable
 fun CalculatorDisplay(display: String) {
@@ -123,7 +131,10 @@ fun CalculatorDisplay(display: String) {
             text = display,
             fontSize = 48.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black
+            color = Color.Black,
+            textAlign = TextAlign.End,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }
@@ -147,40 +158,40 @@ fun CalculatorKeypad(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         CalculatorRow {
-            CalculatorButton("MRC", Modifier.weight(1f), onClick = onMemoryRecall)
-            CalculatorButton("M-", Modifier.weight(1f), onClick = onMemorySubtract)
-            CalculatorButton("M+", Modifier.weight(1f), onClick = onMemoryAdd)
+            CalculatorButton("MRC", Modifier.weight(1f), onClick = onMemoryRecall, backgroundColor = Color.Black)
+            CalculatorButton("M-", Modifier.weight(1f), onClick = onMemorySubtract, backgroundColor = Color.Black)
+            CalculatorButton("M+", Modifier.weight(1f), onClick = onMemoryAdd, backgroundColor = Color.Black)
             CalculatorButton("ON/C", Modifier.weight(1f), onClick = onClearClick, backgroundColor = Color(0xFFD1546F))
         }
         CalculatorRow {
-            CalculatorButton("√", Modifier.weight(1f), onClick = onSquareRoot)
-            CalculatorButton("%", Modifier.weight(1f), onClick = onPercentage)
-            CalculatorButton("±", Modifier.weight(1f), onClick = onSignChange)
+            CalculatorButton("√", Modifier.weight(1f), onClick = onSquareRoot, backgroundColor = Color.Black)
+            CalculatorButton("%", Modifier.weight(1f), onClick = onPercentage, backgroundColor = Color.Black)
+            CalculatorButton("±", Modifier.weight(1f), onClick = onSignChange, backgroundColor = Color.Black)
             CalculatorButton("CE", Modifier.weight(1f), onClick = onClearClick, backgroundColor = Color(0xFFD1546F))
         }
         CalculatorRow {
             CalculatorButton("7", Modifier.weight(1f), onClick = { onDigitClick("7") })
             CalculatorButton("8", Modifier.weight(1f), onClick = { onDigitClick("8") })
-            CalculatorButton("8", Modifier.weight(1f), onClick = { onDigitClick("9") })
-            CalculatorButton("÷", Modifier.weight(1f), onClick = { onOperationClick("÷") })
+            CalculatorButton("9", Modifier.weight(1f), onClick = { onDigitClick("9") })
+            CalculatorButton("÷", Modifier.weight(1f), onClick = { onOperationClick("÷")}, backgroundColor = Color.Black)
         }
         CalculatorRow {
             CalculatorButton("4", Modifier.weight(1f), onClick = { onDigitClick("4") })
             CalculatorButton("5", Modifier.weight(1f), onClick = { onDigitClick("5") })
             CalculatorButton("6", Modifier.weight(1f), onClick = { onDigitClick("6") })
-            CalculatorButton("×", Modifier.weight(1f), onClick = { onOperationClick("×") })
+            CalculatorButton("×", Modifier.weight(1f), onClick = { onOperationClick("×") }, backgroundColor = Color.Black)
         }
         CalculatorRow {
             CalculatorButton("1", Modifier.weight(1f), onClick = { onDigitClick("1") })
             CalculatorButton("2", Modifier.weight(1f), onClick = { onDigitClick("2") })
             CalculatorButton("3", Modifier.weight(1f), onClick = { onDigitClick("3") })
-            CalculatorButton("-", Modifier.weight(1f), onClick = { onOperationClick("-") })
+            CalculatorButton("-", Modifier.weight(1f), onClick = { onOperationClick("-") }, backgroundColor = Color.Black)
         }
         CalculatorRow {
             CalculatorButton("0", Modifier.weight(1f), onClick = { onDigitClick("0") })
             CalculatorButton(".", Modifier.weight(1f), onClick = { onDigitClick(".") })
-            CalculatorButton("3", Modifier.weight(1f), onClick = onEqualsClick)
-            CalculatorButton("+", Modifier.weight(1f), onClick = { onOperationClick("+") })
+            CalculatorButton("=", Modifier.weight(1f), onClick = onEqualsClick)
+            CalculatorButton("+", Modifier.weight(1f), onClick = { onOperationClick("+") }, backgroundColor = Color.Black)
         }
     }
 }
@@ -234,3 +245,4 @@ fun GreetingPreview() {
         CalculatorScreen()
     }
 }
+
