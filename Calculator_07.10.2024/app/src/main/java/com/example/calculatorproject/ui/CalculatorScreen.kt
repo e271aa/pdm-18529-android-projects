@@ -7,6 +7,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.calculatorproject.models.CalculatorBrain
 import com.example.calculatorproject.ui.components.*
 
 @Composable
@@ -18,11 +19,11 @@ fun CalculatorScreen() {
     var shouldResetDisplay by remember { mutableStateOf(false) }
 
     fun updateDisplay(digit: String) {
-        if (shouldResetDisplay) {
-            display = digit
+        display = if (shouldResetDisplay) {
             shouldResetDisplay = false
+            digit
         } else {
-            display = if (display == "0" && digit != ".") digit else display + digit
+            if (display == "0" && digit != ".") digit else display + digit
         }
     }
 
@@ -33,37 +34,11 @@ fun CalculatorScreen() {
         shouldResetDisplay = false
     }
 
-    fun resetCalculatorState() {
-        firstOperand = null
-        currentOperation = null
-        shouldResetDisplay = false
-    }
-
-    fun formatMemoryValue(value: Double): String {
-        return if (value % 1.0 == 0.0) {
-            value.toInt().toString()
-        } else {
-            value.toString()
-        }
-    }
-
-    fun formatResult(value: Double): String {
-        val formatted = value.toString().removeSuffix(".0")
-        return if (formatted.length > 9) formatted.take(9) else formatted
-    }
-
     fun calculate() {
         val secondOperand = display.toDoubleOrNull()
-
         if (firstOperand != null && secondOperand != null && currentOperation != null) {
-            val result = when (currentOperation) {
-                "+" -> firstOperand!! + secondOperand
-                "-" -> firstOperand!! - secondOperand
-                "×" -> firstOperand!! * secondOperand
-                "÷" -> if (secondOperand != 0.0) firstOperand!! / secondOperand else Double.NaN
-                else -> secondOperand
-            }
-            display = formatResult(result)
+            val result = CalculatorBrain.calculate(firstOperand!!, secondOperand, currentOperation!!)
+            display = CalculatorBrain.formatResult(result)
             firstOperand = null
             currentOperation = null
             shouldResetDisplay = true
@@ -72,37 +47,15 @@ fun CalculatorScreen() {
 
     fun setOperation(op: String) {
         val secondOperand = display.toDoubleOrNull()
-
         if (firstOperand != null && secondOperand != null && currentOperation != null) {
-            val result = when (currentOperation) {
-                "+" -> firstOperand!! + secondOperand
-                "-" -> firstOperand!! - secondOperand
-                "×" -> firstOperand!! * secondOperand
-                "÷" -> if (secondOperand != 0.0) firstOperand!! / secondOperand else Double.NaN
-                else -> secondOperand
-            }
-            display = formatResult(result)
+            val result = CalculatorBrain.calculate(firstOperand!!, secondOperand, currentOperation!!)
+            display = CalculatorBrain.formatResult(result)
             firstOperand = result
         } else {
             firstOperand = display.toDoubleOrNull()
         }
-
         currentOperation = op
         shouldResetDisplay = true
-    }
-
-    fun applyPercentage() {
-        if (firstOperand != null && currentOperation != null) {
-            val secondOperand = display.toDoubleOrNull() ?: 0.0
-            val percentageValue = (firstOperand!! * secondOperand) / 100
-            display = formatResult(percentageValue)
-            shouldResetDisplay = true
-        }
-    }
-
-    fun changeSign() {
-        val value = display.toDoubleOrNull() ?: return
-        display = formatResult(-value)
     }
 
     Scaffold(
@@ -130,14 +83,26 @@ fun CalculatorScreen() {
                     onEqualsClick = ::calculate,
                     onEraseClick = ::resetCalculator,
                     onClearClick = { display = "0" },
-                    onMemoryRecall = { display = formatMemoryValue(memory) },
+                    onMemoryRecall = { display = CalculatorBrain.formatMemoryValue(memory) },
                     onMemoryAdd = { memory += display.toDoubleOrNull() ?: 0.0 },
                     onMemorySubtract = { memory -= display.toDoubleOrNull() ?: 0.0 },
                     onSquareRoot = {
-                        display = formatResult(Math.sqrt(display.toDoubleOrNull() ?: 0.0))
+                        display = CalculatorBrain.formatResult(
+                            Math.sqrt(display.toDoubleOrNull() ?: 0.0)
+                        )
                     },
-                    onPercentage = ::applyPercentage,
-                    onSignChange = ::changeSign
+                    onPercentage = {
+                        val secondOperand = display.toDoubleOrNull() ?: 0.0
+                        display = CalculatorBrain.formatResult(
+                            CalculatorBrain.applyPercentage(firstOperand!!, secondOperand)
+                        )
+                        shouldResetDisplay = true
+                    },
+                    onSignChange = {
+                        display = CalculatorBrain.formatResult(
+                            CalculatorBrain.changeSign(display.toDoubleOrNull() ?: 0.0)
+                        )
+                    }
                 )
             }
         }
