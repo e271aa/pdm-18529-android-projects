@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "356356551903",
+    "project_id": "carrinhopartilhado",
+    "storage_bucket": "carrinhopartilhado.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:356356551903:android:ff6808dc92d15ca32c256a",
+        "android_client_info": {
+          "package_name": "com.example.carrinhopartilhado"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCo5v2Y0WkABoRJR0t4km9fiaDZ9q6_OnY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
